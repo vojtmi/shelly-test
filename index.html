@@ -6,6 +6,42 @@
     <title>Shelly Dashboard</title>
 </head>
 <body>
-    
+    <h1>
+        Shelly
+    </h1>
+    <p>Počáteční hodnota: 16,61 kWh</p>
+    <p>Aktualní spotřeba: <span id="current-consum">Načítání ...</span> kWh</p>
+    <script>
+        //Ip adresa
+        const shellyIP = "http://192.168.2.155/status";
+
+        //Startovací hodnota
+        const initConsum = 16611;
+
+        async function fetchConsum() {
+            try {
+                //Získání dat ze Shelly
+                const response = await fetch(shellyIP);
+                const data = await response.json();
+                const totalConsum = data.device.meters[0].total; 
+
+                //Přičtení init to total
+
+                const adjustedConsum = (initConsum + totalConsum);
+
+                document.getElementById('current-consum').innerText = adjustedConsum;
+            } catch (error){
+                console.log("Chyba při načítání");
+                document.getElementById('current-consum').innerHTML = "Chyba při načítání dat";
+            }
+        }
+
+        //refresh
+        window.onload = function() {
+            fetchConsum();
+            setInterval(fetchConsum, 30000) // každých 30 sec
+        }
+
+    </script>
 </body>
 </html>
